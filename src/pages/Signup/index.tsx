@@ -3,7 +3,7 @@ import { Card, CardHeader, CardContent, CardFooter } from "@/shadcn/ui/card";
 import { Input } from "@/shadcn/ui/input";
 import { Button } from "@/shadcn/ui/button";
 import { Label } from "@/shadcn/ui/label";
-import {  Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shadcn/ui/select";
 import { TRADES } from "@/constants";
 import userService from "@/api/services/user.service";
@@ -23,7 +23,7 @@ function Signup() {
   const navigate = useNavigate();
 
   const currentYear = new Date().getFullYear();
-  const batchYears = Array.from({length: 4}, (_, i) => currentYear + 3 - i);
+  const batchYears = Array.from({ length: 4 }, (_, i) => currentYear + 3 - i);
 
   const validateForm = () => {
     let isValid = true;
@@ -47,13 +47,13 @@ function Signup() {
     setIsLoading(true);
     // Add your signup logic here
     try {
-      await  userService.register(name, registration, trade, batch, password);
+      await userService.register(name, registration, trade, batch, password);
       toast({
         title: "Success",
         description: "Account created successfully",
       });
       navigate('/login');
-      
+
     } catch (error) {
       console.log(error);
       toast({
@@ -62,7 +62,7 @@ function Signup() {
         variant: "destructive",
       });
     }
-    finally{
+    finally {
       setIsLoading(false);
     }
   };
@@ -85,7 +85,7 @@ function Signup() {
               <Input
                 id="name"
                 type="text"
-                placeholder="Avinash"
+                placeholder="Utkarsh"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -112,7 +112,7 @@ function Signup() {
               <Input
                 id="registration"
                 type="text"
-                placeholder="2331080"
+                placeholder="254033104"
                 value={registration}
                 onChange={(e) => setRegistration(e.target.value)}
                 required
