@@ -23,7 +23,7 @@ function Signup() {
   const navigate = useNavigate();
 
   const currentYear = new Date().getFullYear();
-  const batchYears = Array.from({length: 4}, (_, i) => currentYear - i);
+  const batchYears = Array.from({length: 4}, (_, i) => currentYear + 3 - i);
 
   const validateForm = () => {
     let isValid = true;
