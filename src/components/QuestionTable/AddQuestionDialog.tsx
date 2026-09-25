@@ -45,7 +45,7 @@ const AddQuestionDialog: React.FC = () => {
     topic_tags: "",
     question_type: "GENERAL",
     difficulty_level: 1,
-    options: ["", ""],
+    options: ["", "", "", ""],
     correct_option: [],
     format: "text",
     img: null,
@@ -149,12 +149,12 @@ const AddQuestionDialog: React.FC = () => {
       const res = await questionService.addQuestion(formData);
       console.log(res);
       // setQuestions([...questions, res.data]);
-      setNewQuestion({ 
+      setNewQuestion({
         description: "",
         topic_tags: "",
         question_type: "GENERAL",
         difficulty_level: 1,
-        options: ["", ""],
+        options: ["", "", "", ""],
         correct_option: [],
         format: "text",
         img: null,
@@ -196,12 +196,12 @@ const AddQuestionDialog: React.FC = () => {
       });
       return;
     }
-    
+
     const newOptions = newQuestion.options.filter((_, i) => i !== index);
     const newCorrectOptions = newQuestion.correct_option
       .filter(optionIndex => optionIndex !== index + 1)
       .map(optionIndex => optionIndex > index + 1 ? optionIndex - 1 : optionIndex);
-    
+
     setNewQuestion({
       ...newQuestion,
       options: newOptions,
@@ -213,7 +213,7 @@ const AddQuestionDialog: React.FC = () => {
   const handleCorrectOptionChange = (optionIndex: number, checked: boolean) => {
     const optionNumber = optionIndex + 1; // Convert to 1-based indexing
     let newCorrectOptions: number[];
-    
+
     if (checked) {
       if (isMultipleAnswer) {
         // For multiple answer questions, add to existing selections
@@ -226,7 +226,7 @@ const AddQuestionDialog: React.FC = () => {
       // Remove the option from selections
       newCorrectOptions = newQuestion.correct_option.filter(opt => opt !== optionNumber);
     }
-    
+
     setNewQuestion({
       ...newQuestion,
       correct_option: newCorrectOptions,
@@ -459,7 +459,7 @@ const AddQuestionDialog: React.FC = () => {
                 </div>
               </div>
               <p className="text-xs text-gray-500">
-                {isMultipleAnswer 
+                {isMultipleAnswer
                   ? "Users can select multiple correct answers"
                   : "Users can only select one correct answer"
                 }
@@ -477,7 +477,7 @@ const AddQuestionDialog: React.FC = () => {
                       <Checkbox
                         id={`correct-${index}`}
                         checked={newQuestion.correct_option.includes(index + 1)}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked) =>
                           handleCorrectOptionChange(index, checked as boolean)
                         }
                       />
@@ -532,7 +532,7 @@ const AddQuestionDialog: React.FC = () => {
 
             <div className="grid gap-2">
               <Label className="text-foreground">
-                Selected Correct Answers: {newQuestion.correct_option.length > 0 
+                Selected Correct Answers: {newQuestion.correct_option.length > 0
                   ? newQuestion.correct_option.map(opt => `Option ${opt}`).join(", ")
                   : "None selected"
                 }
