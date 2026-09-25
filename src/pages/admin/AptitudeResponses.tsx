@@ -66,6 +66,43 @@ function AptitudeResponses() {
     fetchResponses();
   }, [id, page, itemsPerPage]);
 
+  const handleResetAttempt = async (regno: string) => {
+    if (!id) return;
+
+    const confirmed = window.confirm(
+      `Reset the aptitude attempt for ${regno}? This will delete their submitted response and allow them to attempt again.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await aptitudeService.resetAptitudeResponse(
+        Number(id),
+        regno
+      );
+
+      toast({
+        title: "Attempt Reset",
+        description: `Attempt reset successfully for ${regno}`,
+      });
+
+      // Remove the student from the current page immediately
+      setResponses((prev) =>
+        prev.filter((response) => response.regno !== regno)
+      );
+
+      setTotalResponses((prev) => prev - 1);
+    } catch (error) {
+      console.error(error);
+
+      toast({
+        title: "Error",
+        description: "Failed to reset attempt",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
@@ -112,15 +149,29 @@ function AptitudeResponses() {
                 <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.name}</TableCell>
                 <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.rank || "_"}</TableCell>
                 <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.marks}</TableCell>
-                <TableCell>
-                <Link key={response.id} 
-                  className="cursor-pointer"
-                  to={`/aptitude/response/${id}?regno=${response.regno}`}
-                >
-                  <Button size="sm" className="text-[10px] sm:text-xs lg:text-sm">
-                    View</Button>
-                </Link>
-                </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <Link
+                    to={`/aptitude/response/${id}?regno=${response.regno}`}
+                  >
+                    <Button
+                      size="sm"
+                      className="text-[10px] sm:text-xs lg:text-sm"
+                    >
+                      View
+                    </Button>
+                  </Link>
+
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="text-[10px] sm:text-xs lg:text-sm"
+                    onClick={() => handleResetAttempt(response.regno)}
+                  >
+                    Reset
+                  </Button>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

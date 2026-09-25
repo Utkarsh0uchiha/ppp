@@ -36,6 +36,13 @@ class AptitudeService {
         return axiosAuthInstance.get(`/aptitude/responses/${aptitudeId}?page=${page}&items=${items}`).then(res => res.data).catch(err => Promise.reject(err));
     }
 
+    public resetAptitudeResponse(aptitudeId: number, regno: string) {
+        return axiosAuthInstance
+            .delete(`/aptitude/responses/${aptitudeId}/${regno}`)
+            .then(res => res.data)
+            .catch(err => Promise.reject(err.response?.data || err));
+    }
+
     public getAptitudeResult(aptitudeId: number, regno: string | null) {
         return axiosAuthInstance.get(`/aptitude/user/response/${aptitudeId}${regno ? '?regno=' + regno : ''}`).then(res => res.data).catch(err => Promise.reject(err));
     }
