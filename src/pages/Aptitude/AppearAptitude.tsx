@@ -87,6 +87,27 @@ const AppearAptitude = () => {
     const regNoToUse = savedRegNo || regNo;
     const tradeToUse = savedTrade || trade;
 
+    try {
+      const existingResponse = await aptitudeService.getAptitudeResult(
+        Number(aptiId),
+        regNoToUse
+      );
+
+      if (existingResponse?.data) {
+        toast({
+          title: "Already Submitted",
+          description: "You have already submitted this aptitude test.",
+          variant: "destructive",
+        });
+        return;
+      }
+    } catch (error: any) {
+      // 404/no response = student is allowed to start
+      if (error?.response?.status !== 404) {
+        console.error("Failed to check previous attempt:", error);
+        return;
+      }
+    }
     if (!regNoToUse) {
       toast({
         title: "Error",
