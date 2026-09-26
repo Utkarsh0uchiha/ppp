@@ -57,10 +57,10 @@ const AppearAptitude = () => {
 
   // Filter questions by section - General section only has "GENERAL" type (case-insensitive)
   // Technical section has questions matching the user's selected trade
-  const generalQuestions = questions.filter((q) => 
+  const generalQuestions = questions.filter((q) =>
     q.question_type && q.question_type.toLowerCase() === "general"
   );
-  const technicalQuestions = questions.filter((q) => 
+  const technicalQuestions = questions.filter((q) =>
     q.question_type && q.question_type.toLowerCase() === trade.toLowerCase()
   );
   const currentSectionQuestions = activeSection === "general" ? generalQuestions : technicalQuestions;
@@ -68,15 +68,15 @@ const AppearAptitude = () => {
   // Initialize registration number from login data
   useEffect(() => {
     const savedRegNo = sessionStorage.getItem(`aptitude-regno-${aptiId}`);
-    
+
     if (savedRegNo) {
       setRegNo(savedRegNo);
     } else {
       // Try to get from localStorage (where login data is usually stored)
-      const userRegNo = localStorage.getItem("userRegNo") || 
-                        localStorage.getItem("regno") || 
-                        localStorage.getItem("registrationNumber");
-      
+      const userRegNo = localStorage.getItem("userRegNo") ||
+        localStorage.getItem("regno") ||
+        localStorage.getItem("registrationNumber");
+
       if (userRegNo) {
         setRegNo(userRegNo);
       }
@@ -86,16 +86,6 @@ const AppearAptitude = () => {
   const handleGetQuiz = async (savedRegNo?: string, savedTrade?: string) => {
     const regNoToUse = savedRegNo || regNo;
     const tradeToUse = savedTrade || trade;
-
-    // Prevent already submitted re-entry
-    if (localStorage.getItem(`aptitude-${aptiId}-submitted`)) {
-      toast({
-        title: "Error",
-        description: "You have already submitted your quiz",
-        variant: "destructive",
-      });
-      return;
-    }
 
     if (!regNoToUse) {
       toast({
@@ -812,8 +802,6 @@ const AppearAptitude = () => {
       }
 
       if (aptitudeId) {
-        localStorage.setItem(`aptitude-${aptitudeId}-submitted`, "true");
-        localStorage.removeItem(`aptitude-${Number(aptitudeId) - 1}-submitted`);
 
         setTimeout(() => {
           sessionStorage.removeItem(`aptitude-answers-${aptitudeId}`);
@@ -863,40 +851,39 @@ const AppearAptitude = () => {
           <div className="max-w-7xl mx-auto flex flex-col gap-2">
             {/* Top Row - Timer and Warnings */}
             <div className="flex items-center gap-2 justify-between w-full">
-              <div className={`text-white text-xs px-2 py-1 rounded-md shadow font-semibold whitespace-nowrap ${
-                timeLeft <= 5000 ? 'bg-black animate-pulse' : timeLeft <= 30000 ? 'bg-red-600 animate-pulse' : 'bg-red-500'
-              }`}>
+              <div className={`text-white text-xs px-2 py-1 rounded-md shadow font-semibold whitespace-nowrap ${timeLeft <= 5000 ? 'bg-black animate-pulse' : timeLeft <= 30000 ? 'bg-red-600 animate-pulse' : 'bg-red-500'
+                }`}>
                 ⏱ {formatTime(timeLeft)}
               </div>
 
               <div className="flex justify-end">
-              <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
-                <DialogTrigger asChild>
-                  <Button 
-                    disabled={loading} 
-                    className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 whitespace-nowrap"
-                  >
-                  Submit
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="w-[90vw] sm:w-full">
-                  <DialogHeader>
-                    <DialogTitle>Confirm Submission</DialogTitle>
-                    <DialogDescription>
-                      Are you sure you want to submit your answers? This action cannot be undone.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="flex justify-end gap-4">
-                    <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>
-                      Cancel
+                <Dialog open={showSubmitDialog} onOpenChange={setShowSubmitDialog}>
+                  <DialogTrigger asChild>
+                    <Button
+                      disabled={loading}
+                      className="px-3 py-1 text-xs bg-green-600 hover:bg-green-700 whitespace-nowrap"
+                    >
+                      Submit
                     </Button>
-                    <Button disabled={loading} onClick={() => handleSubmitQuestions(false, regNo)}>
-                      {loading ? "Submitting..." : "Confirm"}
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+                  </DialogTrigger>
+                  <DialogContent className="w-[90vw] sm:w-full">
+                    <DialogHeader>
+                      <DialogTitle>Confirm Submission</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to submit your answers? This action cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex justify-end gap-4">
+                      <Button variant="outline" onClick={() => setShowSubmitDialog(false)}>
+                        Cancel
+                      </Button>
+                      <Button disabled={loading} onClick={() => handleSubmitQuestions(false, regNo)}>
+                        {loading ? "Submitting..." : "Confirm"}
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
               {/* <div className="bg-black text-white text-xs px-2 py-1 rounded-md shadow font-semibold whitespace-nowrap">
                 ⚠ {warnings}/5
               </div> */}
@@ -906,58 +893,56 @@ const AppearAptitude = () => {
             </div>
 
             {/* Bottom Row - Submit Button */}
-            
+
           </div>
         </div>
 
         {/* Section Tabs - Fully Responsive */}
         <div className="fixed top-16 left-0 right-0 z-40 bg-white border-b">
-  <div className="mx-auto max-w-5xl px-2 sm:px-4">
-    <div className="flex w-full">
-      
-      {/* Aptitude Tab */}
-      <button
-        onClick={() => {
-          setActiveSection("general");
-          setCurrentPage(0);
-        }}
-        className={`w-1/2 py-3 text-xs sm:text-sm font-semibold transition-all
-        border-b-4 flex items-center justify-center gap-1
-        ${
-          activeSection === "general"
-            ? "border-blue-600 text-blue-600 bg-blue-50"
-            : "border-transparent text-gray-600 hover:bg-gray-50"
-        }`}
-      >
-        Aptitude
-        <span className="text-[10px] sm:text-xs text-gray-500">
-          ({generalQuestions.length})
-        </span>
-      </button>
+          <div className="mx-auto max-w-5xl px-2 sm:px-4">
+            <div className="flex w-full">
 
-      {/* Technical Tab */}
-      <button
-        onClick={() => {
-          setActiveSection("technical");
-          setCurrentPage(0);
-        }}
-        className={`w-1/2 py-3 text-xs sm:text-sm font-semibold transition-all
+              {/* Aptitude Tab */}
+              <button
+                onClick={() => {
+                  setActiveSection("general");
+                  setCurrentPage(0);
+                }}
+                className={`w-1/2 py-3 text-xs sm:text-sm font-semibold transition-all
         border-b-4 flex items-center justify-center gap-1
-        ${
-          activeSection === "technical"
-            ? "border-blue-600 text-blue-600 bg-blue-50"
-            : "border-transparent text-gray-600 hover:bg-gray-50"
-        }`}
-      >
-        {trade || "Technical"}
-        <span className="text-[10px] sm:text-xs text-gray-500">
-          ({technicalQuestions.length})
-        </span>
-      </button>
+        ${activeSection === "general"
+                    ? "border-blue-600 text-blue-600 bg-blue-50"
+                    : "border-transparent text-gray-600 hover:bg-gray-50"
+                  }`}
+              >
+                Aptitude
+                <span className="text-[10px] sm:text-xs text-gray-500">
+                  ({generalQuestions.length})
+                </span>
+              </button>
 
-    </div>
-  </div>
-</div>
+              {/* Technical Tab */}
+              <button
+                onClick={() => {
+                  setActiveSection("technical");
+                  setCurrentPage(0);
+                }}
+                className={`w-1/2 py-3 text-xs sm:text-sm font-semibold transition-all
+        border-b-4 flex items-center justify-center gap-1
+        ${activeSection === "technical"
+                    ? "border-blue-600 text-blue-600 bg-blue-50"
+                    : "border-transparent text-gray-600 hover:bg-gray-50"
+                  }`}
+              >
+                {trade || "Technical"}
+                <span className="text-[10px] sm:text-xs text-gray-500">
+                  ({technicalQuestions.length})
+                </span>
+              </button>
+
+            </div>
+          </div>
+        </div>
 
 
         {/* Main Content */}
@@ -1023,18 +1008,16 @@ const AppearAptitude = () => {
                         return (
                           <label
                             key={optIdx}
-                            className={`flex items-start space-x-3 p-3 rounded-lg border-2 cursor-pointer transition-all active:scale-95 ${
-                              selectedOptions.includes(backendOptionIndex)
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
+                            className={`flex items-start space-x-3 p-3 rounded-lg border-2 cursor-pointer transition-all active:scale-95 ${selectedOptions.includes(backendOptionIndex)
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-gray-300'
+                              }`}
                           >
                             <input
                               type={isSingleAnswer ? "radio" : "checkbox"}
                               name={`q${question.id}`}
-                              className={`mt-1 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded flex-shrink-0 cursor-pointer ${
-                                isSingleAnswer ? 'rounded-full' : 'rounded'
-                              }`}
+                              className={`mt-1 w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500 rounded flex-shrink-0 cursor-pointer ${isSingleAnswer ? 'rounded-full' : 'rounded'
+                                }`}
                               checked={selectedOptions.includes(backendOptionIndex)}
                               onChange={() =>
                                 handleAnswerChange(Number(question.id), optIdx)
@@ -1066,13 +1049,12 @@ const AppearAptitude = () => {
                   <button
                     key={question.id}
                     onClick={() => setCurrentPage(idx)}
-                    className={`p-2 rounded text-xs font-semibold transition-colors ${
-                      currentPage === idx
-                        ? 'bg-blue-600 text-white'
-                        : isQuestionAttempted(Number(question.id))
-                          ? 'bg-green-100 text-green-800 border-2 border-green-500'
-                          : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
-                    }`}
+                    className={`p-2 rounded text-xs font-semibold transition-colors ${currentPage === idx
+                      ? 'bg-blue-600 text-white'
+                      : isQuestionAttempted(Number(question.id))
+                        ? 'bg-green-100 text-green-800 border-2 border-green-500'
+                        : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
+                      }`}
                   >
                     {idx + 1}
                   </button>
@@ -1189,7 +1171,7 @@ const AppearAptitude = () => {
       <div className="w-full max-w-md">
         <div className="bg-white rounded-lg shadow-lg p-4 sm:p-8">
           <h1 className="text-xl sm:text-2xl font-bold text-center mb-4 text-gray-800">Aptitude Test</h1>
-          
+
           {/* Display Registration Number */}
           <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-xs text-gray-600 font-medium">Registration Number:</p>
