@@ -88,7 +88,7 @@ const AppearAptitude = () => {
     const tradeToUse = savedTrade || trade;
 
     try {
-      const existingResponse = await aptitudeService.getAptitudeResult(
+      const existingResponse: any = await aptitudeService.getAptitudeResult(
         Number(aptiId),
         regNoToUse
       );
