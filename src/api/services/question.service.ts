@@ -12,6 +12,13 @@ class QuestionService {
             (res => res.data).catch(err => Promise.reject(err.response.data));
     }
 
+    public updateQuestion(id: number, question: any) {
+        return axiosAuthInstance
+            .put(`/question/${id}`, question)
+            .then(res => res.data)
+            .catch(err => Promise.reject(err.response?.data || err));
+    }
+    
     public deleteQuestion(id: number) {
         return axiosAuthInstance.delete(`/question/${id}`).then
             (res => res.data).catch(err => Promise.reject(err.response.data));

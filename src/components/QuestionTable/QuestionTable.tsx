@@ -10,6 +10,9 @@ import {
 } from "@/shadcn/ui/table";
 import { Button } from "@/shadcn/ui/button";
 import { Checkbox } from "@/shadcn/ui/checkbox";
+import { Input } from "@/shadcn/ui/input";
+import { Textarea } from "@/shadcn/ui/textarea";
+import { Label } from "@/shadcn/ui/label";
 import questionService from "@/api/services/question.service";
 import {
   Dialog,
@@ -31,9 +34,12 @@ const QuestionTable: React.FC<QuestionTableProps> = ({ questions }) => {
   );
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [questionToDelete, setQuestionToDelete] = React.useState<number | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false);
+  const [editingQuestion, setEditingQuestion] = React.useState<Question | null>(null);
+  const [isUpdating, setIsUpdating] = React.useState(false);
 
   const timestampToDate = (timestamp: string) => {
-    const date = new Date(parseInt(timestamp) );
+    const date = new Date(parseInt(timestamp));
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
@@ -57,6 +63,58 @@ const QuestionTable: React.FC<QuestionTableProps> = ({ questions }) => {
     }
   }
 
+  const handleEdit = (question: Question) => {
+    setEditingQuestion({
+      ...question,
+      options: [...(question.options || [])],
+      correct_option: [...(question.correct_option || [])],
+    });
+
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateQuestion = async () => {
+    if (!editingQuestion) return;
+
+    try {
+      setIsUpdating(true);
+
+      await questionService.updateQuestion(
+        Number(editingQuestion.id),
+        {
+          description: editingQuestion.description,
+          options: editingQuestion.options,
+          correct_option: editingQuestion.correct_option,
+          difficulty_level: editingQuestion.difficulty_level,
+          question_type: editingQuestion.question_type,
+          format: editingQuestion.format,
+          topic_tags: editingQuestion.topic_tags,
+        }
+      );
+
+      toast({
+        title: "Success",
+        description: "Question updated successfully",
+      });
+
+      setEditDialogOpen(false);
+      setEditingQuestion(null);
+
+      window.location.reload();
+
+    } catch (error: any) {
+      console.error("Update question error:", error);
+
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to update question",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   const dispatch = useDispatch();
 
   return (
@@ -72,7 +130,7 @@ const QuestionTable: React.FC<QuestionTableProps> = ({ questions }) => {
               <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button 
+              <Button
                 variant="destructive"
                 onClick={() => questionToDelete && deleteQs(questionToDelete)}
               >
@@ -80,6 +138,102 @@ const QuestionTable: React.FC<QuestionTableProps> = ({ questions }) => {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Question</DialogTitle>
+          </DialogHeader>
+
+          {editingQuestion && (
+            <div className="flex flex-col gap-4">
+
+              {/* Question */}
+              <div>
+                <Label>Question</Label>
+                <Textarea
+                  value={editingQuestion.description}
+                  onChange={(e) =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      description: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              {/* Options */}
+              <div>
+                <Label>Options</Label>
+
+                {editingQuestion.options.map((option, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-2 mt-2"
+                  >
+                    <Input
+                      value={option}
+                      onChange={(e) => {
+                        const newOptions = [...editingQuestion.options];
+                        newOptions[index] = e.target.value;
+
+                        setEditingQuestion({
+                          ...editingQuestion,
+                          options: newOptions,
+                        });
+                      }}
+                    />
+
+                    <Checkbox
+                      checked={editingQuestion.correct_option.includes(index + 1)}
+                      onCheckedChange={(checked) => {
+                        let newCorrectOptions =
+                          editingQuestion.correct_option.filter(
+                            (opt) => opt !== index + 1
+                          );
+
+                        if (checked) {
+                          newCorrectOptions.push(index + 1);
+                        }
+
+                        setEditingQuestion({
+                          ...editingQuestion,
+                          correct_option: newCorrectOptions,
+                        });
+                      }}
+                    />
+
+                    <span className="text-sm">
+                      Correct
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Save */}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  onClick={handleUpdateQuestion}
+                  disabled={isUpdating}
+                >
+                  {isUpdating ? "Saving..." : "Save Changes"}
+                </Button>
+              </div>
+
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -124,7 +278,11 @@ const QuestionTable: React.FC<QuestionTableProps> = ({ questions }) => {
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(question)}
+                  >
                     Edit
                   </Button>
                   <Button
