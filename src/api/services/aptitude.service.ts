@@ -32,8 +32,8 @@ class AptitudeService {
         return axiosAuthInstance.post('/aptitude/question/delete', { aptitudeId, questionId }).then(res => res.data).catch(err => (Promise.reject(err.response.data)));
     }
 
-    public getAptitudeResponses(aptitudeId: number, page: number, items: number) {
-        return axiosAuthInstance.get(`/aptitude/responses/${aptitudeId}?page=${page}&items=${items}`).then(res => res.data).catch(err => Promise.reject(err));
+    public getAptitudeResponses(aptitudeId: number, page: number, items: number, search: string = "") {
+        return axiosAuthInstance.get(`/aptitude/responses/${aptitudeId}?page=${page}&items=${items}&search=${encodeURIComponent(search)}`).then(res => res.data).catch(err => Promise.reject(err));
     }
 
     public resetAptitudeResponse(aptitudeId: number, regno: string) {
@@ -70,6 +70,6 @@ class AptitudeService {
         return axiosAuthInstance.get('/aptitude/toppers/' + aptitudeId).then(res => res.data).catch(err => (Promise.reject(err.response.data)));
     }
 
-    
+
 }
 export default new AptitudeService();

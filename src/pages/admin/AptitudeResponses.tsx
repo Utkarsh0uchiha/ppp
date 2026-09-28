@@ -21,6 +21,7 @@ import {
 } from "@/shadcn/ui/select";
 import { Link } from "react-router-dom";
 import { Button } from "@/shadcn/ui/button";
+import { Input } from "@/shadcn/ui/input";
 
 interface AptitudeResponse {
   id: number;
@@ -37,6 +38,7 @@ function AptitudeResponses() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalResponses, setTotalResponses] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [search, setSearch] = useState("");
   const { toast } = useToast();
   const { id } = useParams();
 
@@ -47,7 +49,8 @@ function AptitudeResponses() {
           await aptitudeService.getAptitudeResponses(
             Number(id),
             page,
-            itemsPerPage
+            itemsPerPage,
+            search
           );
         console.log();
         setResponses(response.data.responses);
@@ -64,7 +67,7 @@ function AptitudeResponses() {
       }
     };
     fetchResponses();
-  }, [id, page, itemsPerPage]);
+  }, [id, page, itemsPerPage, search]);
 
   const handleResetAttempt = async (regno: string) => {
     if (!id) return;
@@ -107,27 +110,46 @@ function AptitudeResponses() {
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Aptitude Responses</h1>
-        <div className="flex justify-between items-center mt-2">
-          <p className="text-xs sm:text-sm lg:text-base text-gray-600">Total Responses: {totalResponses}</p>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] sm:text-xs lg:text-sm text-gray-600">Rows per page:</span>
-            <Select
-              value={itemsPerPage.toString()}
-              onValueChange={(value) => {
-                setItemsPerPage(Number(value));
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-2">
+          <p className="text-xs sm:text-sm lg:text-base text-gray-600">
+            Total Responses: {totalResponses}
+          </p>
+
+          <div className="flex items-center gap-3">
+            <Input
+              placeholder="Search regno, name or trade..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
                 setPage(1);
               }}
-            >
-              <SelectTrigger className="w-[80px]">
-                <SelectValue placeholder="25" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="25">25</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-                <SelectItem value="75">75</SelectItem>
-                <SelectItem value="100">100</SelectItem>
-              </SelectContent>
-            </Select>
+              className="w-[220px]"
+            />
+
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] sm:text-xs lg:text-sm text-gray-600">
+                Rows per page:
+              </span>
+
+              <Select
+                value={itemsPerPage.toString()}
+                onValueChange={(value) => {
+                  setItemsPerPage(Number(value));
+                  setPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[80px]">
+                  <SelectValue placeholder="25" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="75">75</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
@@ -145,10 +167,10 @@ function AptitudeResponses() {
         <TableBody>
           {responses?.map((response) => (
             <TableRow key={response.id}>
-                <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.regno} {response.trade? '/'+response.trade:''}</TableCell>
-                <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.name}</TableCell>
-                <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.rank || "_"}</TableCell>
-                <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.marks}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.regno} {response.trade ? '/' + response.trade : ''}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.name}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.rank || "_"}</TableCell>
+              <TableCell className="text-[10px] sm:text-xs lg:text-sm">{response.marks}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Link
